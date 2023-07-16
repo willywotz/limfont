@@ -8,6 +8,24 @@ function redirectTo($path) {
   exit;
 }
 
+function user() {
+  if (empty($_SESSION['user-identity'])) {
+    return false;
+  }
+
+  $user = [];
+  $user['displayName'] = $_SESSION['user-identity'];
+
+  return (object) $user;
+}
+
 function login($identity) {
-  return true;
+  $_SESSION['user-identity'] = $identity;
+
+  return user();
+}
+
+function logout() {
+  $_SESSION['user-identity'] = false;
+  session_destroy();
 }
