@@ -2,7 +2,7 @@
 
 include 'ubn.php';
 
-if (!empty($_SESSION['user-identity'])) {
+if (user()) {
   redirectTo('index.php');
 }
 
@@ -10,8 +10,7 @@ $error_message = false;
 if (isset($_POST['user-identity'])) {
   $identity = $_POST['user-identity'];
 
-  if ($identity = login($identity)) {
-    $_SESSION['user-identity'] = $identity;
+  if (login($identity)) {
     redirectTo('index.php');
   }
 
