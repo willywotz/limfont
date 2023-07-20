@@ -8,9 +8,7 @@ if (user()) {
 
 $error_message = false;
 if (isset($_POST['user-identity'])) {
-  $identity = $_POST['user-identity'];
-
-  if (login($identity)) {
+  if (login($_POST['user-identity'])) {
     redirectTo('index.php');
   }
 
