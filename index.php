@@ -1,6 +1,7 @@
 <?php
 
 include 'ubn.php';
+loginCheck();
 
 ?>
 
@@ -15,7 +16,8 @@ include 'ubn.php';
   <body>
     <div class="d-flex align-items-center">
       <div class="w-100 m-auto py-4" style="max-width: 800px">
-        <div>k. <?=user()->displayName; ?></div>
+
+        <div>k. <?=user()->display_name ?></div>
 
         <table class="table table-bordered">
           <thead>
