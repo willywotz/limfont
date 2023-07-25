@@ -1,81 +1,62 @@
 <?php
 
-include 'ubn.php';
-loginCheck();
+class App {
+  static $memory;
+
+  public $page;
+  public $user;
+
+  function __construct() {
+    session_start();
+
+    $this->page = $_GET['p'] ?? 'index';
+    $this->user = $this->user();
+  }
+
+  function redirectTo($page) {
+    header("Location: index.php?p=$page");
+    echo "<script>window.location.href = 'index.php?p=$page';</script>";
+    exit;
+  }
+
+  function user($newuser = null) {
+    if ($newuser != null) { $this->user = $newuser; }
+    if ($this->user != null) { return $this->user; }
+
+    return false;
+  }
+
+  static function memory() {
+    if (!static::$memory) {
+      static::$memory = new static;
+    }
+
+    return static::$memory;
+  }
+}
+
+function app() {
+  return App::memory();
+}
+app();
+
+// login check
+if (app()->page != 'login' && !app()->user) {
+  app()->redirectTo('login');
+} elseif (app()->page == 'login' && app()->user != false) {
+  app()->redirectTo('index');
+}
 
 ?>
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>KOREA.SHOP</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <style></style>
   </head>
   <body>
-    <div class="d-flex align-items-center">
-      <div class="w-100 m-auto py-4" style="max-width: 800px">
-
-        <div>k. <?=user()->display_name ?></div>
-
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">วันที่สั่งซื้อสินค้า</th>
-              <th scope="col">ชื่อสินค้า</th>
-              <th scope="col">วิธีชำระเงิน</th>
-              <th scope="col">รหัสสินค้า</th>
-              <th scope="col">สถานะสินค้า</th>
-              <th scope="col">แจ้งเลขพัสดุ</th>
-              <th scope="col">ที่อยู่ / เปลี่ยนที่อยู่</th>
-              <th scope="col">สินค้าในสต๊อก</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">1</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-              <td>@mdo</td>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-              <td>@mdo</td>
-            </tr>
-            <tr>
-              <th scope="row">2</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-              <td>@mdo</td>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-              <td>@mdo</td>
-            </tr>
-            <tr>
-              <th scope="row">3</th>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-              <td>@mdo</td>
-              <td>Mark</td>
-              <td>Otto</td>
-              <td>@mdo</td>
-              <td>@mdo</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div class="text-center">
-          <a href="logout.php" class="btn btn-secondary" style="width: 150px">ออก</a>
-        </div>
-      </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script></script>
   </body>
 </html>
