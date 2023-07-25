@@ -68,6 +68,7 @@ if (app()->page == 'login' && app()->isPost) {
     html, body { font: 16px/1.5 sans-serif; color: #333; }
     body { margin: 0; }
 
+    <?php if (app()->page == 'login'): ?>
     .login-block { position: fixed; left: 0; right: 0; top: 0; bottom: 0; }
     .login-block { display: flex; justify-content: center; align-items: center; }
     .login-body { width: 100%; max-width: 330px; }
@@ -77,6 +78,7 @@ if (app()->page == 'login' && app()->isPost) {
     .login-error.has-error { display: block; }
     .login-btn { padding-top: 1em; }
     .login-btn button { font: inherit; width: 100%; }
+    <?php endif; ?>
     </style>
   </head>
   <body>
