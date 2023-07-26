@@ -22,12 +22,13 @@ class Database {
     return static::$instance;
   }
 
-  static function getDb() {
-    return static::getInstance()->dbh;
+  static function __callStatic($name, $arguments) {
+    $callback = [static::getInstance()->dbh, $name];
+    return call_user_func_array($callback, $arguments);
   }
 }
 
-function db() { return Database::getDb(); } db();
+class_alias('Database', 'db'); db::getInstance();
 
 class User {
   public $id;
