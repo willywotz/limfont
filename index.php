@@ -1,7 +1,50 @@
 <?php
 
+class Database {
+  static $instance;
+
+  public $dbh;
+
+  function __construct() {
+    $dsn = 'mysql:dbname=limfont;host=127.0.0.1';
+    $user = 'root';
+    $password = '';
+
+    $this->dbh = new PDO($dsn, $user, $password);
+    $this->dbh->query('select 1');
+  }
+
+  static function getInstance() {
+    if (!static::$instance) {
+      static::$instance = new static;
+    }
+
+    return static::$instance;
+  }
+
+  static function getDb() {
+    return static::getInstance()->dbh;
+  }
+}
+
+function db() { return Database::getDb(); } db();
+
+class User {
+  public $id;
+  public $identity;
+
+  function __construct($input = []) {
+    $this->id = $input['id'] ?? 0;
+    $this->identity = $input['identity'] ?? '';
+  }
+
+  static function create($input = []) {
+    return new static($input);
+  }
+}
+
 class App {
-  static $memory;
+  static $instance;
 
   public $page;
   public $isPost;
@@ -13,6 +56,10 @@ class App {
     $this->page = $_GET['p'] ?? 'index';
     $this->isPost = $_SERVER['REQUEST_METHOD'] == 'POST';
     $this->user = $this->user();
+
+    if (!empty($_SESSION['identity'])) {
+      $this->login($_SESSION['identity']);
+    }
   }
 
   function redirectTo($page) {
@@ -28,19 +75,23 @@ class App {
     return false;
   }
 
-  static function memory() {
-    if (!static::$memory) {
-      static::$memory = new static;
+  function login($identity) {
+    $user = User::create(['id' => 0, 'identity' => $identity]);
+    $_SESSION['identity'] = $identity;
+
+    return $this->user($user);
+  }
+
+  static function getInstance() {
+    if (!static::$instance) {
+      static::$instance = new static;
     }
 
-    return static::$memory;
+    return static::$instance;
   }
 }
 
-function app() {
-  return App::memory();
-}
-app();
+function app() { return App::getInstance(); } app();
 
 // login check
 if (app()->page != 'login' && !app()->user) {
@@ -50,9 +101,8 @@ if (app()->page != 'login' && !app()->user) {
 }
 
 if (app()->page == 'login' && app()->isPost) {
-  $value = null;
-
-  echo json_encode($value);
+  $user = app()->login($_POST['identity'] ?? '');
+  echo json_encode($user);
   exit;
 }
 
@@ -96,14 +146,15 @@ if (app()->page == 'login' && app()->isPost) {
 
     <script>
     <?php if (app()->page == 'login'): ?>
-    var loginForm = document.getElementById('login-form');
+    const loginForm = document.getElementById('login-form');
     loginForm.onsubmit = async function (el) {
       el.preventDefault();
 
-      const response = await fetch('?p=login', { method: 'POST' });
+      const body = new FormData(el.target);
+      const response = await fetch('?p=login', { method: 'POST', body });
       const login = await response.json();
 
-      if (login == null) {
+      if (login != false) {
         location.href = '?p=index';
         return;
       }
