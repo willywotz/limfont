@@ -42,6 +42,16 @@ class User {
   static function create($input = []) {
     return new static($input);
   }
+
+  static function login($identity) {
+    $sth = db::prepare('select * from user where identity = ?');
+    $sth->execute([$identity]);
+
+    $result = $sth->fetch(PDO::FETCH_ASSOC);
+    if ($result == false) { return null; }
+
+    return new static($result);
+  }
 }
 
 class App {
@@ -77,7 +87,7 @@ class App {
   }
 
   function login($identity) {
-    $user = User::create(['id' => 0, 'identity' => $identity]);
+    $user = User::login($identity);
     $_SESSION['identity'] = $identity;
 
     return $this->user($user);
@@ -98,13 +108,13 @@ function app() { return App::getInstance(); } app();
 if (app()->page != 'login' && !app()->user) {
   app()->redirectTo('login');
 } elseif (app()->page == 'login' && app()->user != false) {
-  app()->redirectTo('index');
-}
-
-if (app()->page == 'login' && app()->isPost) {
+  app()->redirectTo('home');
+} elseif (app()->page == 'login' && app()->isPost) {
   $user = app()->login($_POST['identity'] ?? '');
   echo json_encode($user);
   exit;
+} elseif (app()->page != 'home') {
+  app()->redirectTo('home');
 }
 
 ?>
