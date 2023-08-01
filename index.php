@@ -1,121 +1,61 @@
 <?php
 
-class Database {
-  static $instance;
+define('DBDSN', 'mysql:dbname=limfont');
+define('DBUSER', 'root');
+define('DBPASS', '');
 
-  public $dbh;
-
-  function __construct() {
-    $dsn = 'mysql:dbname=limfont;host=127.0.0.1';
-    $user = 'root';
-    $password = '';
-
-    $this->dbh = new PDO($dsn, $user, $password);
-    $this->dbh->query('select 1');
-  }
-
-  static function getInstance() {
-    if (!static::$instance) {
-      static::$instance = new static;
-    }
-
-    return static::$instance;
-  }
-
-  static function __callStatic($name, $arguments) {
-    $callback = [static::getInstance()->dbh, $name];
-    return call_user_func_array($callback, $arguments);
-  }
-}
-
-class_alias('Database', 'db'); db::getInstance();
-
-class User {
-  public $id;
-  public $identity;
-
-  function __construct($input = []) {
-    $this->id = $input['id'] ?? 0;
-    $this->identity = $input['identity'] ?? '';
-  }
-
-  static function create($input = []) {
-    return new static($input);
-  }
-
-  static function login($identity) {
-    $sth = db::prepare('select * from user where identity = ?');
-    $sth->execute([$identity]);
-
-    $result = $sth->fetch(PDO::FETCH_ASSOC);
-    if ($result == false) { return null; }
-
-    return new static($result);
-  }
-}
-
-class App {
-  static $instance;
-
+class Application {
   public $page;
-  public $isPost;
   public $user;
 
+  private static $instance;
+  private static $connection;
+
   function __construct() {
-    session_start();
+    $this->page = $_GET['p'] ?? 'home';
 
-    $this->page = $_GET['p'] ?? 'index';
-    $this->isPost = $_SERVER['REQUEST_METHOD'] == 'POST';
-    $this->user = $this->user();
-
-    if (!empty($_SESSION['identity'])) {
-      $this->login($_SESSION['identity']);
-    }
+    $this->db(); // pre-check db (select 1)
+    $this->dispatch();
   }
 
-  function redirectTo($page) {
-    header("Location: index.php?p=$page");
-    echo "<script>window.location.href = 'index.php?p=$page';</script>";
+  function dispatch() {
+    function m($x) { return $_SERVER['REQUEST_METHOD'] == $x; }
+    function p($x) { return preg_match('/'.$x.'/', $_GET['p'] ?? 'home') != false; }
+
+    // if (false) {}
+    // elseif (p('home')) { $this->redirector('home'); }
+  }
+
+  function redirector($uri) {
+    header("Location: index.php?p=$uri");
+    echo "<script>location.href = 'index.php?=$uri'</script>";
     exit;
   }
 
-  function user($newuser = null) {
-    if ($newuser != null) { $this->user = $newuser; }
-    if ($this->user != null) { return $this->user; }
-
-    return false;
-  }
-
-  function login($identity) {
-    $user = User::login($identity);
-    $_SESSION['identity'] = $identity;
-
-    return $this->user($user);
-  }
-
   static function getInstance() {
-    if (!static::$instance) {
+    if (static::$instance == null) {
       static::$instance = new static;
     }
-
     return static::$instance;
+  }
+
+  static function getDatabase() {
+    if (static::$connection == null) {
+      static::$connection = new PDO(DBDSN, DBUSER, DBPASS);
+      static::$connection->query('select 1');
+    }
+    return static::$connection;
+  }
+
+  function db() {
+    return static::getDatabase();
   }
 }
 
-function app() { return App::getInstance(); } app();
-
-// login check
-if (app()->page != 'login' && !app()->user) {
-  app()->redirectTo('login');
-} elseif (app()->page == 'login' && app()->user != false) {
-  app()->redirectTo('home');
-} elseif (app()->page == 'login' && app()->isPost) {
-  $user = app()->login($_POST['identity'] ?? '');
-  echo json_encode($user);
-  exit;
-} elseif (app()->page != 'home') {
-  app()->redirectTo('home');
+function app() {
+  return Application::getInstance();
 }
+app();
 
 ?>
 <!DOCTYPE html>
@@ -145,34 +85,15 @@ if (app()->page != 'login' && !app()->user) {
   <body>
     <?php if (app()->page == 'login'): ?>
     <div class="login-block">
-      <form class="login-body" id="login-form">
+      <form class="login-body" action="index.php?p=login" method="POST">
         <div class="login-img"><img src="https://placehold.co/400" alt=""></div>
-        <div class="login-title"><h1>KOREA.SHOP</h1></div>
+        <div class="login-title"><a href="index.php?p=home"><h1>KOREA.SHOP</h1></a></div>
         <div class="login-input"><input type="text" name="identity" required="" placeholder="รหัสผู้ใช้งาน"></div>
-        <div class="login-error" id="login-error"><span>ข้อมูลไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</span></div>
+        <div class="login-error"><span>ข้อมูลไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</span></div>
         <div class="login-btn"><button>เข้าใช้งาน</button></div>
       </form>
     </div>
     <?php endif; ?>
 
-    <script>
-    <?php if (app()->page == 'login'): ?>
-    const loginForm = document.getElementById('login-form');
-    loginForm.onsubmit = async function (el) {
-      el.preventDefault();
-
-      const body = new FormData(el.target);
-      const response = await fetch('?p=login', { method: 'POST', body });
-      const login = await response.json();
-
-      if (login != false) {
-        location.href = '?p=index';
-        return;
-      }
-
-      document.getElementById('login-error').classList.add('has-error');
-    };
-    <?php endif; ?>
-    </script>
   </body>
 </html>
