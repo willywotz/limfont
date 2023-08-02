@@ -14,6 +14,7 @@ class Application {
   private static $connection;
 
   function __construct() {
+    date_default_timezone_set('Asia/Bangkok');
     session_start();
 
     $this->page = $_GET['p'] ?? 'home';
@@ -29,6 +30,14 @@ class Application {
 
     if (m('GET') && p('login') && !$this->user) { return; }
     if (m('POST') && p('login') && !$this->user) { return $this->loginPost(); }
+    if ($this->isAdmin) {
+      if (m('GET') && p('admin-products')) { return $this->adminAllProduct(); }
+      if (m('GET') && p('admin-add-product')) { return; }
+      if (m('POST') && p('admin-add-product')) { return $this->adminAddProductPost(); }
+      if (m('GET') && p('admin-set-product')) { return $this->adminSetProduct(); }
+      if (m('POST') && p('admin-set-product')) { return $this->adminSetProductPost(); }
+      if (m('GET') && p('admin-del-product')) { return $this->adminDelProduct(); }
+    }
     if (m('GET') && !p('home')) { return $this->redirector('home'); }
   }
 
@@ -50,6 +59,40 @@ class Application {
 
     $_SESSION['identity'] = $user->identity;
     return $this->redirector('home');
+  }
+
+  function adminAllProduct() {
+    global $products;
+    $products = $this->getAllProduct();
+  }
+
+  function adminAddProductPost() {
+    $image = $this->uploadFile($_FILES['image']['tmp_name']);
+    $product = $this->addProduct($_POST['name'], $_POST['price'], $_POST['quantity'], $image);
+
+    return $this->redirector('admin-products');
+  }
+
+  function adminSetProduct() {
+    global $product;
+    $product = $this->getProductById($_GET['id']);
+  }
+
+  function adminSetProductPost() {
+    $image = $_POST['old_image'];
+    if (!empty($_FILES['image']['tmp_name'])) {
+      if ($image != '') unlink(UPLOADPATH.'/'.$image);
+      $image = $this->uploadFile($_FILES['image']['tmp_name']);
+    }
+
+    $product = $this->setProduct($_POST['id'], $_POST['name'], $_POST['price'], $_POST['quantity'], $image);
+
+    return $this->redirector('admin-products');
+  }
+
+  function adminDelProduct() {
+    $this->delProduct($_GET['id']);
+    return $this->redirector('admin-products');
   }
 
   function redirector($uri) {
@@ -137,9 +180,9 @@ class Application {
   }
 
   function delProduct($id) {
-    $sql = "delete from products where id = ?";
+    $sql = "update products set deleted_at = ? where id = ?";
     $sth = $this->db()->prepare($sql);
-    $sth->execute([$id]);
+    $sth->execute([date('Y-m-d H:i:s'), $id]);
 
     return $sth->rowCount() > 0;
   }
@@ -171,6 +214,8 @@ app();
     * { box-sizing: border-box; }
     html, body { font: 16px/1.5 sans-serif; color: #333; }
     body { margin: 0; }
+    img { max-width: 100%; height: auto; }
+    .block { margin: 0 auto; max-width: 600px; }
 
     <?php if (app()->page != 'login'): ?>
     .navbar { margin: 0 auto; max-width: 600px; }
@@ -217,7 +262,7 @@ app();
 
     <?php if (app()->page == 'login'): ?>
     <div class="login-block">
-      <form class="login-body" action="index.php?p=login" method="POST">
+      <form action="index.php?p=login" method="post" class="login-body">
         <div class="login-img"><img src="https://placehold.co/400" alt=""></div>
         <div class="login-title"><a href="index.php?p=home"><h1>KOREA.SHOP</h1></a></div>
         <div class="login-input"><input type="text" name="identity" required="" placeholder="รหัสผู้ใช้งาน"></div>
@@ -225,6 +270,49 @@ app();
         <div class="login-btn"><button>เข้าใช้งาน</button></div>
       </form>
     </div>
+    <?php endif; ?>
+
+    <?php if (app()->page == 'admin-products'): ?>
+    <table class="block" style="width: 100%;">
+      <tr>
+        <th>#</th>
+        <th>name</th>
+        <th>price</th>
+        <th>quantity</th>
+        <th></th>
+        <th></th>
+      </tr>
+
+      <?php foreach ($products as $product): ?>
+      <tr>
+        <td><?=$product->id ?></td>
+        <td><?=$product->name ?></td>
+        <td><?=$product->price ?></td>
+        <td><?=$product->quantity ?></td>
+        <td><a href="index.php?p=admin-set-product&id=<?=$product->id ?>">edit</a></td>
+        <td><a href="index.php?p=admin-del-product&id=<?=$product->id ?>">delete</a></td>
+      </tr>
+      <?php endforeach; ?>
+
+    </table>
+    <?php endif; ?>
+
+    <?php if (app()->page == 'admin-add-product'
+      || app()->page == 'admin-set-product'): ?>
+    <form action="index.php?p=<?=$_GET['p'] ?>" method="post" enctype="multipart/form-data" class="block">
+      <?php if (app()->page == 'admin-set-product'): ?>
+      <input type="hidden" name="id" value="<?=$_GET['id'] ?>">
+      <input type="hidden" name="old_image" value="<?=$product->image ?? '' ?>">
+      <?php endif;?>
+      <input type="text" name="name" value="<?=$product->name ?? '' ?>">
+      <input type="text" name="price" value="<?=$product->price ?? '' ?>">
+      <input type="text" name="quantity" value="<?=$product->quantity ?? '' ?>">
+      <?php if (isset($product->image) && $product->image != ''): ?>
+      <img src="upload/<?=$product->image ?>" alt="">
+      <?php endif; ?>
+      <input type="file" name="image">
+      <button>submit</button>
+    </form>
     <?php endif; ?>
 
   </body>
