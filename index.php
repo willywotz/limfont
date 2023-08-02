@@ -41,9 +41,12 @@ class Application {
   }
 
   function uploadFile($tmpName) {
-    do { $to = UPLOADPATH.'/'.$this->randomString(); } while (is_file($to));
+    do {
+      $name = $this->randomString();
+      $to = UPLOADPATH.'/'.$name;
+    } while (is_file($to));
     $ret = move_uploaded_file($tmpName, $to);
-    return $ret ? $to : false;
+    return $ret ? $name : false;
   }
 
   static function getInstance() {
@@ -63,6 +66,48 @@ class Application {
 
   function db() {
     return static::getDatabase();
+  }
+
+  function getAllProduct() {
+    $sql = "select * from products where deleted_at is null";
+    $sth = $this->db()->prepare($sql);
+    $sth->execute();
+
+    return $sth->fetchAll(PDO::FETCH_CLASS);
+  }
+
+  function getProductById($id) {
+    $sql = "select * from products where id = ? and deleted_at is null";
+    $sth = $this->db()->prepare($sql);
+    $sth->execute([$id]);
+
+    $product = $sth->fetchObject();
+    return $product ? $product : null;
+  }
+
+  function addProduct($name, $price, $quantity, $image) {
+    $sql = "insert into products (name, price, quantity, image) values (?, ?, ?, ?)";
+    $sth = $this->db()->prepare($sql);
+    $sth->execute([$name, $price, $quantity, $image]);
+    $id = $this->db()->lastInsertId();
+
+    return $this->getProductById($id);
+  }
+
+  function setProduct($id, $name, $price, $quantity, $image) {
+    $sql = "update products set name = ?, price = ?, quantity = ?, image = ? where id = ?";
+    $sth = $this->db()->prepare($sql);
+    $sth->execute([$name, $price, $quantity, $image, $id]);
+
+    return $this->getProductById($id);
+  }
+
+  function delProduct($id) {
+    $sql = "delete from products where id = ?";
+    $sth = $this->db()->prepare($sql);
+    $sth->execute([$id]);
+
+    return $sth->rowCount() > 0;
   }
 }
 
