@@ -3,6 +3,7 @@
 define('DBDSN', 'mysql:dbname=limfont');
 define('DBUSER', 'root');
 define('DBPASS', '');
+define('UPLOADPATH', __DIR__ . '/upload');
 
 class Application {
   public $page;
@@ -37,6 +38,12 @@ class Application {
     for ($ret = ''; strlen($ret) < $length;)
       $ret .= $sample[strlen($sample)-1-rand(0,strlen($sample))];
     return $ret;
+  }
+
+  function uploadFile($tmpName) {
+    do { $to = UPLOADPATH.'/'.$this->randomString(); } while (is_file($to));
+    $ret = move_uploaded_file($tmpName, $to);
+    return $ret ? $to : false;
   }
 
   static function getInstance() {
