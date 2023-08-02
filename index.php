@@ -13,9 +13,12 @@ class Application {
   private static $connection;
 
   function __construct() {
+    session_start();
+
     $this->page = $_GET['p'] ?? 'home';
 
     $this->db(); // pre-check db (select 1)
+    $this->autoLogin();
     $this->dispatch();
   }
 
@@ -23,8 +26,29 @@ class Application {
     function m($x) { return $_SERVER['REQUEST_METHOD'] == $x; }
     function p($x) { return preg_match('/'.$x.'/', $_GET['p'] ?? 'home') != false; }
 
-    if (m('GET') && p('login')) { return; }
+    if (m('GET') && p('login') && !$this->user) { return; }
+    if (m('POST') && p('login') && !$this->user) { return $this->loginPost(); }
     if (m('GET') && !p('home')) { return $this->redirector('home'); }
+  }
+
+  function autoLogin() {
+    if (!isset($_SESSION['identity'])) { return false; }
+    $user = $this->login($_SESSION['identity']);
+
+    return $user != null;
+  }
+
+  function loginPost() {
+    global $hasError;
+
+    $user = $this->login($_POST['identity']);
+    if (!$user) {
+      $hasError = true;
+      return false;
+    }
+
+    $_SESSION['identity'] = $user->identity;
+    return $this->redirector('home');
   }
 
   function redirector($uri) {
@@ -68,6 +92,15 @@ class Application {
     return static::getDatabase();
   }
 
+  function getUserByIdentity($identity) {
+    $sql = "select * from users where identity = ? and deleted_at is null";
+    $sth = $this->db()->prepare($sql);
+    $sth->execute([$identity]);
+
+    $user = $sth->fetchObject();
+    return $user ? $user : null;
+  }
+
   function getAllProduct() {
     $sql = "select * from products where deleted_at is null";
     $sth = $this->db()->prepare($sql);
@@ -108,6 +141,14 @@ class Application {
     $sth->execute([$id]);
 
     return $sth->rowCount() > 0;
+  }
+
+  function login($identity) {
+    $user = $this->getUserByIdentity($identity);
+    if (!$user) { return false; }
+    $this->user = $user;
+
+    return $user;
   }
 }
 
@@ -178,7 +219,7 @@ app();
         <div class="login-img"><img src="https://placehold.co/400" alt=""></div>
         <div class="login-title"><a href="index.php?p=home"><h1>KOREA.SHOP</h1></a></div>
         <div class="login-input"><input type="text" name="identity" required="" placeholder="รหัสผู้ใช้งาน"></div>
-        <div class="login-error"><span>ข้อมูลไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</span></div>
+        <div class="login-error<?php if (isset($hasError) && $hasError): ?> has-error<?php endif; ?>"><span>ข้อมูลไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง</span></div>
         <div class="login-btn"><button>เข้าใช้งาน</button></div>
       </form>
     </div>
