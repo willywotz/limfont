@@ -8,6 +8,7 @@ define('UPLOADPATH', __DIR__ . '/upload');
 class Application {
   public $page;
   public $user;
+  public $isAdmin;
 
   private static $instance;
   private static $connection;
@@ -147,6 +148,7 @@ class Application {
     $user = $this->getUserByIdentity($identity);
     if (!$user) { return false; }
     $this->user = $user;
+    $this->isAdmin = $user->is_admin == 1;
 
     return $user;
   }
