@@ -216,6 +216,7 @@ app();
     body { margin: 0; }
     img { max-width: 100%; height: auto; }
     .block { margin: 0 auto; max-width: 600px; }
+    .mt-1 { margin-top: 1rem; }
 
     <?php if (app()->page != 'login'): ?>
     .navbar { margin: 0 auto; max-width: 600px; }
@@ -273,7 +274,7 @@ app();
     <?php endif; ?>
 
     <?php if (app()->page == 'admin-products'): ?>
-    <table class="block" style="width: 100%;">
+    <table class="block mt-1" style="width: 100%;">
       <tr>
         <th>#</th>
         <th>name</th>
@@ -299,7 +300,7 @@ app();
 
     <?php if (app()->page == 'admin-add-product'
       || app()->page == 'admin-set-product'): ?>
-    <form action="index.php?p=<?=$_GET['p'] ?>" method="post" enctype="multipart/form-data" class="block">
+    <form action="index.php?p=<?=$_GET['p'] ?>" method="post" enctype="multipart/form-data" class="block mt-1">
       <?php if (app()->page == 'admin-set-product'): ?>
       <input type="hidden" name="id" value="<?=$_GET['id'] ?>">
       <input type="hidden" name="old_image" value="<?=$product->image ?? '' ?>">
