@@ -3,6 +3,7 @@
 define('DBDSN', 'mysql:dbname=limfont');
 define('DBUSER', 'root');
 define('DBPASS', '');
+
 define('UPLOADPATH', __DIR__ . '/upload');
 
 class Application {
@@ -19,6 +20,7 @@ class Application {
 
     $this->page = $_GET['p'] ?? 'home';
 
+    $this->checkUploadDirectory();
     $this->db(); // pre-check db (select 1)
     $this->autoLogin();
     $this->dispatch();
@@ -124,6 +126,12 @@ class Application {
     } while (is_file($to));
     $ret = move_uploaded_file($tmpName, $to);
     return $ret ? $name : false;
+  }
+
+  function checkUploadDirectory() {
+    $targetDir = UPLOADPATH;
+    if (file_exists($targetDir)) { return; }
+    mkdir($targetDir, 0777, true);
   }
 
   static function getInstance() {
