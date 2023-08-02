@@ -30,6 +30,9 @@ class Application {
 
     if (m('GET') && p('login') && !$this->user) { return; }
     if (m('POST') && p('login') && !$this->user) { return $this->loginPost(); }
+
+    if (m('GET') && p('home')) { return $this->home(); }
+
     if ($this->isAdmin) {
       if (m('GET') && p('admin-products')) { return $this->adminAllProduct(); }
       if (m('GET') && p('admin-add-product')) { return; }
@@ -38,6 +41,7 @@ class Application {
       if (m('POST') && p('admin-set-product')) { return $this->adminSetProductPost(); }
       if (m('GET') && p('admin-del-product')) { return $this->adminDelProduct(); }
     }
+
     if (m('GET') && !p('home')) { return $this->redirector('home'); }
   }
 
@@ -59,6 +63,11 @@ class Application {
 
     $_SESSION['identity'] = $user->identity;
     return $this->redirector('home');
+  }
+
+  function home() {
+    global $products;
+    $products = $this->getAllProduct();
   }
 
   function adminAllProduct() {
@@ -225,7 +234,7 @@ app();
     .navbar-body h1 { margin: 0; }
     .navbar-title { flex: 1; background-color: hsla(0deg 0% 0% / 25%); }
     .navbar-link { background-color: hsla(0deg 0% 0% / 75%); color: #fff; display: flex; align-items: center; padding: 0 1rem; text-decoration: none; }
-    @media screen and (min-width: 800px) { .navbar-body { margin-top: 4rem; } }
+    @media screen and (min-width: 800px) { .navbar-body { margin-top: 2rem; } }
     <?php endif; ?>
 
     <?php if (app()->page == 'login'): ?>
@@ -238,6 +247,17 @@ app();
     .login-error.has-error { display: block; }
     .login-btn { padding-top: 1em; }
     .login-btn button { font: inherit; width: 100%; }
+    <?php endif; ?>
+
+    <?php if (app()->page == 'home'): ?>
+    .home { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 1rem 0; }
+    .home-card:hover { background-color: hsla(0deg 0% 0% / 10%); }
+    .home img { max-height: 300px; }
+    .home h2 { margin: 0; }
+    .cart { position: fixed; bottom: 1rem; right: 1rem; }
+    .cart span { border-radius: 50%; background-color: #000; color: #fff; opacity: 0.75; padding: 1rem; text-align: center; }
+    .cart:hover span { opacity: 1; }
+    @media screen and (min-width: 800px) { .cart { right: calc(50% - 400px) } }
     <?php endif; ?>
     </style>
   </head>
@@ -271,6 +291,24 @@ app();
         <div class="login-btn"><button>เข้าใช้งาน</button></div>
       </form>
     </div>
+    <?php endif; ?>
+
+    <?php if (app()->page == 'home'): ?>
+    <div class="home block">
+      <?php foreach ($products as $product): ?>
+      <div class="home-card">
+        <img src="upload/<?=$product->image ?>" alt="">
+        <h2><?=$product->name ?></h2>
+        <div></div>
+        <div>เหลืออีก <span style="font-weight: bold;"><?=$product->quantity ?></span> ชิ้น | ราคา <span style="font-weight: bold;"><?=number_format($product->price, 2) ?></span> บาท</div>
+        <a href="index.php?p=add-cart&id=<?=$product->id ?>">เพิ่มลงตะกร้า</a>
+      </div>
+      <?php endforeach; ?>
+    </div>
+
+    <a href="index.php?p=cart" class="cart">
+      <span class="material-symbols-outlined">shopping_cart</span>
+    </a>
     <?php endif; ?>
 
     <?php if (app()->page == 'admin-products'): ?>
