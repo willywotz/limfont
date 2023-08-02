@@ -73,7 +73,7 @@ class Application {
     $sth = $this->db()->prepare($sql);
     $sth->execute();
 
-    return $sth->fetchAll(PDO::FETCH_CLASS);
+    return $sth->fetchAll(PDO::FETCH_OBJ);
   }
 
   function getProductById($id) {
