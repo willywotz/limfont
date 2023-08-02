@@ -68,8 +68,9 @@ class Application {
   }
 
   function home() {
-    global $products;
+    global $products, $cartCount;
     $products = $this->getAllProduct();
+    $cartCount = 0;
   }
 
   function adminAllProduct() {
@@ -263,8 +264,9 @@ app();
     .home img { max-height: 300px; }
     .home h2 { margin: 0; }
     .cart { position: fixed; bottom: 1rem; right: 1rem; }
-    .cart span { border-radius: 50%; background-color: #000; color: #fff; opacity: 0.75; padding: 1rem; text-align: center; }
-    .cart:hover span { opacity: 1; }
+    .cart-body { border-radius: 50%; background-color: #000; color: #fff; opacity: 0.75; padding: 1rem; text-align: center; }
+    .cart:hover .cart-body { opacity: 1; }
+    .cart-count { position: absolute; top: -0.5rem; right: 0; color: #f00; background-color: #fff; width: 1.5rem; height: 1.5rem; text-align: center; border-radius: 50%; }
     @media screen and (min-width: 800px) { .cart { right: calc(50% - 400px) } }
     <?php endif; ?>
     </style>
@@ -315,7 +317,8 @@ app();
     </div>
 
     <a href="index.php?p=cart" class="cart">
-      <span class="material-symbols-outlined">shopping_cart</span>
+      <div class="material-symbols-outlined cart-body">shopping_cart</div>
+      <span class="cart-count"><?=$cartCount ?></span>
     </a>
     <?php endif; ?>
 
