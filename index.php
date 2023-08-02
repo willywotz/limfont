@@ -32,6 +32,13 @@ class Application {
     exit;
   }
 
+  function randomString($length = 4) {
+    $sample = 'abcdefghijklmnopqrstuvwxyz';
+    for ($ret = ''; strlen($ret) < $length;)
+      $ret .= $sample[strlen($sample)-1-rand(0,strlen($sample))];
+    return $ret;
+  }
+
   static function getInstance() {
     if (static::$instance == null) {
       static::$instance = new static;
