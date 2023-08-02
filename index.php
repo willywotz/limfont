@@ -22,6 +22,7 @@ class Application {
     function m($x) { return $_SERVER['REQUEST_METHOD'] == $x; }
     function p($x) { return preg_match('/'.$x.'/', $_GET['p'] ?? 'home') != false; }
 
+    if (m('GET') && p('login')) { return; }
     if (m('GET') && !p('home')) { return $this->redirector('home'); }
   }
 
