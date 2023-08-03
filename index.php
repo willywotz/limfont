@@ -393,12 +393,6 @@ app();
 
     <?php if (app()->page == 'cart'): ?>
     <table class="cart block mt-1" style="width: 100%;">
-      <tr>
-        <th>name</th>
-        <th>image</th>
-        <th>quantity</th>
-        <th></th>
-      </tr>
       <?php foreach ($carts as $cart): ?>
       <tr>
         <td><?=$cart->name ?></td>
