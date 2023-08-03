@@ -28,12 +28,16 @@ class Application {
 
   function dispatch() {
     function m($x) { return $_SERVER['REQUEST_METHOD'] == $x; }
-    function p($x) { return preg_match('/'.$x.'/', $_GET['p'] ?? 'home') != false; }
+    function p($x) { return ($_GET['p'] ?? 'home') == $x; }
 
     if (m('GET') && p('login') && !$this->user) { return; }
     if (m('POST') && p('login') && !$this->user) { return $this->loginPost(); }
 
-    if (m('GET') && p('home')) { return $this->home(); }
+    if (m('GET') && p('home')) { return $this->userHome(); }
+
+    if (m('GET') && p('cart')) { return $this->userCart(); }
+    if (m('GET') && p('add-cart')) { return $this->userAddCart(); }
+    if (m('GET') && p('del-cart')) { return $this->userDelCart(); }
 
     if ($this->isAdmin) {
       if (m('GET') && p('admin-products')) { return $this->adminAllProduct(); }
@@ -67,10 +71,25 @@ class Application {
     return $this->redirector('home');
   }
 
-  function home() {
+  function userHome() {
     global $products, $cartCount;
     $products = $this->getAllProduct();
-    $cartCount = 0;
+    $cartCount = $this->getCountCartByUserId($this->user->id);
+  }
+
+  function userCart() {
+    global $carts;
+    $carts = $this->getAllCartByUserId($this->user->id);
+  }
+
+  function userAddCart() {
+    $this->addCart($this->user->id, $_GET['id']);
+    return $this->redirector('home');
+  }
+
+  function userDelCart() {
+    $this->delCart($_GET['id']);
+    return $this->redirector('cart');
   }
 
   function adminAllProduct() {
@@ -205,6 +224,43 @@ class Application {
     return $sth->rowCount() > 0;
   }
 
+  function getAllCartByUserId($userId) {
+    $sql = "select carts.id, products.name, products.price, products.image, products.quantity as maxQuantity from carts left join products on products.id = carts.product_id where user_id = ?";
+    $sth = $this->db()->prepare($sql);
+    $sth->execute([$userId]);
+
+    return $sth->fetchAll(PDO::FETCH_OBJ);
+  }
+
+  function getCountCartByUserId($userId) {
+    $sql = "select count(id) from carts where user_id = ?";
+    $sth = $this->db()->prepare($sql);
+    $sth->execute([$userId]);
+
+    return $sth->fetch()['count(id)'];
+  }
+
+  function addCart($userId, $productId) {
+    $sql = "select 1 from carts where user_id = ? and product_id = ?";
+    $sth = $this->db()->prepare($sql);
+    $sth->execute([$userId, $productId]);
+    if ($sth->fetch()) { return false; }
+
+    $sql = "insert into carts (user_id, product_id) values (?, ?)";
+    $sth = $this->db()->prepare($sql);
+    $sth->execute([$userId, $productId]);
+
+    return $sth->rowCount() > 0;
+  }
+
+  function delCart($id) {
+    $sql = "delete from carts where id = ?";
+    $sth = $this->db()->prepare($sql);
+    $sth->execute([$id]);
+
+    return $sth->rowCount() > 0;
+  }
+
   function login($identity) {
     $user = $this->getUserByIdentity($identity);
     if (!$user) { return false; }
@@ -269,6 +325,12 @@ app();
     .cart-count { position: absolute; top: -4rem; right: 0; color: #f00; background-color: #fff; width: 1.5rem; height: 1.5rem; text-align: center; border-radius: 50%; }
     @media screen and (min-width: 800px) { .cart { right: calc(50% - 400px) } }
     <?php endif; ?>
+
+    <?php if (app()->page == 'cart'): ?>
+    .cart img { max-height: 100px; }
+    .checkout a { display: block; background-color: hsla(0deg 0% 0% / 25%); text-align: center; padding: 1rem 0; }
+    .checkout a:hover { background-color: hsla(0deg 0% 0% / 50%); }
+    <?php endif; ?>
     </style>
   </head>
   <body>
@@ -318,8 +380,32 @@ app();
 
     <a href="index.php?p=cart" class="cart">
       <div class="material-symbols-outlined cart-body">shopping_cart</div>
+      <?php if (app()->user): ?>
       <div style="position: relative;"><span class="cart-count"><?=$cartCount ?></span></div>
+      <?php endif; ?>
     </a>
+    <?php endif; ?>
+
+    <?php if (app()->page == 'cart'): ?>
+    <table class="cart block mt-1" style="width: 100%;">
+      <tr>
+        <th>name</th>
+        <th>image</th>
+        <th>quantity</th>
+        <th></th>
+      </tr>
+      <?php foreach ($carts as $cart): ?>
+      <tr>
+        <td><?=$cart->name ?></td>
+        <td><img src="upload/<?=$cart->image ?>"></td>
+        <td><input type="text" name="quantity[<?=$cart->id ?>]" value="1"></td>
+        <td><a href="index.php?p=del-cart&id=<?=$cart->id ?>">delete</a></td>
+      </tr>
+      <?php endforeach; ?>
+    </table>
+    <div class="checkout block mt-1">
+      <a href="index.php?p=checkout">checkout</a>
+    </div>
     <?php endif; ?>
 
     <?php if (app()->page == 'admin-products'): ?>
