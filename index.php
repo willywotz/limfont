@@ -83,6 +83,9 @@ class Application {
   }
 
   function userAddCart() {
+    if (!$this->user) {
+      return $this->redirector('login');
+    }
     $this->addCart($this->user->id, $_GET['id']);
     return $this->redirector('home');
   }
