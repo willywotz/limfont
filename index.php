@@ -74,7 +74,9 @@ class Application {
   function userHome() {
     global $products, $cartCount;
     $products = $this->getAllProduct();
-    $cartCount = $this->getCountCartByUserId($this->user->id);
+    if ($this->user) {
+      $cartCount = $this->getCountCartByUserId($this->user->id);
+    }
   }
 
   function userCart() {
@@ -381,12 +383,12 @@ app();
       <?php endforeach; ?>
     </div>
 
+    <?php if (app()->user): ?>
     <a href="index.php?p=cart" class="cart">
       <div class="material-symbols-outlined cart-body">shopping_cart</div>
-      <?php if (app()->user): ?>
       <div style="position: relative;"><span class="cart-count"><?=$cartCount ?></span></div>
-      <?php endif; ?>
     </a>
+    <?php endif; ?>
     <?php endif; ?>
 
     <?php if (app()->page == 'cart'): ?>
