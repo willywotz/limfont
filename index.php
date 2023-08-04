@@ -296,6 +296,10 @@ app();
     img { max-width: 100%; height: auto; }
     .block { margin: 0 auto; max-width: 600px; }
     .mt-1 { margin-top: 1rem; }
+    .hidden { display: none !important; }
+
+    #img-show { position: fixed; top: 0; bottom: 0; left: 0; right: 0; z-index: 10; background-color: hsla(0deg 0% 0% / 50%); display: flex; justify-content: center; align-items: center; padding: 1rem; }
+    #img-show img { max-height: 100%; }
 
     <?php if (app()->page != 'login'): ?>
     .navbar { margin: 0 auto; max-width: 600px; }
@@ -324,7 +328,7 @@ app();
     .home-card:hover { background-color: hsla(0deg 0% 0% / 10%); }
     .home img { max-height: 300px; }
     .home h2 { margin: 0; }
-    .cart { position: fixed; bottom: 1rem; right: 1rem; }
+    .cart { position: fixed; bottom: 1rem; right: 1rem; z-index: 5; }
     .cart-body { border-radius: 50%; background-color: #000; color: #fff; opacity: 0.75; padding: 1rem; text-align: center; }
     .cart:hover .cart-body { opacity: 1; }
     .cart-count { position: absolute; top: -4rem; right: 0; color: #f00; background-color: #fff; width: 1.5rem; height: 1.5rem; text-align: center; border-radius: 50%; }
@@ -449,6 +453,22 @@ app();
       <button>submit</button>
     </form>
     <?php endif; ?>
+
+    <div id="img-show" class="hidden"><img src="" alt=""></div>
+
+    <script>
+    var imageShower = (function () {
+      var showerEl = document.getElementById('img-show');
+      showerEl.onclick = () => showerEl.classList.add('hidden');
+      showerEl.show = () => showerEl.classList.remove('hidden');
+
+      var showerImageEl = showerEl.querySelector('img');
+      return el => {showerImageEl.src = el.src; showerEl.show();};
+    })();
+
+    var allImageEl = document.querySelectorAll('img');
+    allImageEl.forEach(el => el.onclick = () => imageShower(el));
+    </script>
 
   </body>
 </html>
