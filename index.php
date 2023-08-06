@@ -359,6 +359,9 @@ app();
         </a>
         <?php endif; ?>
       </div>
+      <div class="navbar-body" style="margin-top: 1;">
+        <a href="index.php?p=admin-products">สินค้า</a>
+      </div>
     </div>
     <?php endif; ?>
 
@@ -400,14 +403,15 @@ app();
       <?php foreach ($carts as $cart): ?>
       <tr>
         <td><?=$cart->name ?></td>
+        <td>ราคา <?=$cart->price ?> บาท</td>
         <td><img src="upload/<?=$cart->image ?>"></td>
-        <td><input type="text" name="quantity[<?=$cart->id ?>]" value="1"></td>
-        <td><a href="index.php?p=del-cart&id=<?=$cart->id ?>">delete</a></td>
+        <td>จำนวน <input type="text" name="quantity[<?=$cart->id ?>]" value="1"> ชิ้น</td>
+        <td><a href="index.php?p=del-cart&id=<?=$cart->id ?>">ลบ</a></td>
       </tr>
       <?php endforeach; ?>
     </table>
     <div class="checkout block mt-1">
-      <a href="index.php?p=checkout">checkout</a>
+      <a href="index.php?p=checkout">สั่งสินค้า</a>
     </div>
     <?php endif; ?>
 
@@ -428,8 +432,8 @@ app();
         <td><?=$product->name ?></td>
         <td><?=$product->price ?></td>
         <td><?=$product->quantity ?></td>
-        <td><a href="index.php?p=admin-set-product&id=<?=$product->id ?>">edit</a></td>
-        <td><a href="index.php?p=admin-del-product&id=<?=$product->id ?>">delete</a></td>
+        <td><a href="index.php?p=admin-set-product&id=<?=$product->id ?>">แก้ไข</a></td>
+        <td><a href="index.php?p=admin-del-product&id=<?=$product->id ?>">ลบ</a></td>
       </tr>
       <?php endforeach; ?>
 
@@ -450,7 +454,7 @@ app();
       <img src="upload/<?=$product->image ?>" alt="">
       <?php endif; ?>
       <input type="file" name="image">
-      <button>submit</button>
+      <button>บันทึก</button>
     </form>
     <?php endif; ?>
 
