@@ -288,6 +288,7 @@ app();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <style>
     * { box-sizing: border-box; }
@@ -325,7 +326,6 @@ app();
 
     <?php if (app()->page == 'home'): ?>
     .home { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 1rem 0; }
-    .home-card:hover { background-color: hsla(0deg 0% 0% / 10%); }
     .home img { max-height: 300px; }
     .home h2 { margin: 0; }
     .cart { position: fixed; bottom: 1rem; right: 1rem; z-index: 5; }
@@ -347,7 +347,7 @@ app();
     <div class="navbar">
       <div class="navbar-body">
         <a href="index.php?p=home" class="navbar-title">
-          <h1>KOREA.SHOP</h1>
+          <h1 class="text-2xl underline">KOREA.SHOP</h1>
         </a>
         <?php if (app()->user): ?>
         <a href="index.php?p=profile" class="navbar-link">
@@ -378,14 +378,13 @@ app();
     <?php endif; ?>
 
     <?php if (app()->page == 'home'): ?>
-    <div class="home block">
+    <div class="home block grid grid-cols-2 gap-4">
       <?php foreach ($products as $product): ?>
-      <div class="home-card">
-        <img src="upload/<?=$product->image ?>" alt="">
+      <div class="home-card flex flex-col border rounded p-2">
+        <img src="upload/<?=$product->image ?>" class="w-full h-auto">
         <h2><?=$product->name ?></h2>
-        <div></div>
-        <div>เหลืออีก <span style="font-weight: bold;"><?=$product->quantity ?></span> ชิ้น | ราคา <span style="font-weight: bold;"><?=number_format($product->price, 2) ?></span> บาท</div>
-        <a href="index.php?p=add-cart&id=<?=$product->id ?>">เพิ่มลงตะกร้า</a>
+        <div class="grow">เหลืออีก <span style="font-weight: bold;"><?=$product->quantity ?></span> ชิ้น | ราคา <span style="font-weight: bold;"><?=number_format($product->price, 2) ?></span> บาท</div>
+        <a href="index.php?p=add-cart&id=<?=$product->id ?>" class="p-2 text-center bg-blue-500 hover:bg-blue-700 text-white rounded">เพิ่มลงตะกร้า</a>
       </div>
       <?php endforeach; ?>
     </div>
@@ -422,8 +421,9 @@ app();
         <th>name</th>
         <th>price</th>
         <th>quantity</th>
-        <th></th>
-        <th></th>
+        <th colspan="2">
+          <a href="index.php?p=admin-add-product">เพิ่มสินค้า</a>
+        </th>
       </tr>
 
       <?php foreach ($products as $product): ?>
@@ -447,9 +447,18 @@ app();
       <input type="hidden" name="id" value="<?=$_GET['id'] ?>">
       <input type="hidden" name="old_image" value="<?=$product->image ?? '' ?>">
       <?php endif;?>
-      <input type="text" name="name" value="<?=$product->name ?? '' ?>">
-      <input type="text" name="price" value="<?=$product->price ?? '' ?>">
-      <input type="text" name="quantity" value="<?=$product->quantity ?? '' ?>">
+      <div>
+        <label for="name">name</label>
+        <input type="text" id="name" name="name" value="<?=$product->name ?? '' ?>">
+      </div>
+      <div>
+        <label for="price">price</label>
+        <input type="text" id="price" name="price" value="<?=$product->price ?? '' ?>">
+      </div>
+      <div>
+        <label for="quantity">quantity</label>
+        <input type="text" id="quantity" name="quantity" value="<?=$product->quantity ?? '' ?>">
+      </div>
       <?php if (isset($product->image) && $product->image != ''): ?>
       <img src="upload/<?=$product->image ?>" alt="">
       <?php endif; ?>
