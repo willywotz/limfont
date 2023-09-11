@@ -22,3 +22,22 @@ function user() {
 function site() {
     return db()->query('select * from site')->fetch(PDO::FETCH_OBJ);
 }
+
+function checkUploadDirectory() {
+    if (file_exists(UPLOADDIR)) { return true; }
+    return mkdir(UPLOADDIR, 0777, true);
+}
+
+checkUploadDirectory();
+
+function randomString($length = 4) {
+    $sample = 'abcdefghijklmnopqrstuvwxyz';
+    for ($ret = ''; strlen($ret) < $length;)
+        $ret .= $sample[strlen($sample)-1-rand(0,strlen($sample))];
+    return $ret;
+}
+
+function uploadRandomName($tempName) {
+    do { $a = randomString(); $b = UPLOADDIR.'/'.$a; } while (is_file($b));
+    return move_uploaded_file($tempName, $b) ? $a : uploadRandomName($tempName);
+}

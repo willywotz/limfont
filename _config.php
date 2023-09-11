@@ -3,6 +3,8 @@ define('DBHOST', 'mysql:dbname=limfont');
 define('DBUSER', 'root');
 define('DBPASS', '');
 
+define('UPLOADDIR', __DIR__.'/upload');
+
 date_default_timezone_set('Asia/Bangkok');
 session_start();
 
