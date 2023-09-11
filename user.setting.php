@@ -16,6 +16,8 @@ if (isPost()) {
 }
 
 ?>
+<div class="mt-8 text-white text-2xl">จัดการข้อมูลผู้ใช้งาน</div>
+
 <style type="text/tailwindcss">
 form label { @apply text-white text-xl }
 form input, form textarea, form button { @apply rounded p-4 bg-white w-full }
@@ -23,8 +25,6 @@ form input, form textarea, form button { @apply rounded p-4 bg-white w-full }
 
 <form action="user.setting.php" method="post" enctype="multipart/form-data"
     class="flex flex-col gap-8 my-8">
-
-    <div class="text-white text-2xl">จัดการข้อมูลผู้ใช้งาน</div>
 
     <div class="flex flex-col gap-4">
         <label for="identity">identity</label>
