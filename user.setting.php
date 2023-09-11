@@ -16,7 +16,7 @@ if (isPost()) {
 }
 
 ?>
-<div class="mt-8 text-white text-2xl">จัดการข้อมูลผู้ใช้งาน</div>
+<div class="mt-8 text-white text-2xl">บัญชีของฉัน</div>
 
 <style type="text/tailwindcss">
 form label { @apply text-white text-xl }

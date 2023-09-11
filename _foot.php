@@ -1,8 +1,8 @@
         </div>
 
         <div id="topmenu" class="!hidden">
-            <a href="user.index.php">หน้าบ้าน</a>
-            <a href="user.setting.php">จัดการข้อมูลผู้ใช้งาน</a>
+            <a href="user.index.php">การซื้อของฉัน</a>
+            <a href="user.setting.php">บัญชีของฉัน</a>
             <?php if (user()->canAdmin): ?>
             <a href="admin.index.php">จัดการข้อมูลหลังบ้าน</a>
             <?php endif ?>
