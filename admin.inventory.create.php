@@ -2,7 +2,7 @@
 include '_adminhead.php';
 
 if (isPost()) {
-    $_POST['image'] = '256';
+    $_POST['image'] = $product->image;
     if ($_FILES['image']['size'] > 0) {
         $_POST['image'] = uploadRandomName($_FILES['image']['tmp_name']);
     }
@@ -14,6 +14,7 @@ if (isPost()) {
         goto render;
     }
     header('Location: admin.inventory.index.php');
+    unlink(UPLOADDIR.'/'.$product->image);
     exit;
 }
 
