@@ -12,6 +12,7 @@
     <?php $products = db()->query('select * from product')->fetchAll(PDO::FETCH_OBJ) ?>
     <?php foreach ($products as $product): ?>
     <div class="rounded overflow-hidden bg-white">
+        <div class="p-2 border-b"><?= $product->serial ?></div>
         <div class="py-8 text-2xl border-b text-center"><?= $product->title ?></div>
         <div class="grid grid-cols-2 text-white text-center">
             <a href="admin.product.update.php?id=<?= $product->id ?>" class="bg-yellow-500 hover:bg-yellow-700 py-2">แก้ไข</a>
