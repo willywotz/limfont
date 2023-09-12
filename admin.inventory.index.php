@@ -14,8 +14,8 @@
     <div class="rounded overflow-hidden bg-white">
         <div class="py-8 text-2xl border-b text-center"><?= $product->title ?></div>
         <div class="grid grid-cols-2 text-white text-center">
-            <a href="admin.inventory.update.php?identity=<?= $product->id ?>" class="bg-yellow-500 hover:bg-yellow-700 py-2">แก้ไข</a>
-            <a href="admin.inventory.delete.php?identity=<?= $product->id ?>" class="bg-red-500 hover:bg-red-700 py-2">ลบ</a>
+            <a href="admin.inventory.update.php?id=<?= $product->id ?>" class="bg-yellow-500 hover:bg-yellow-700 py-2">แก้ไข</a>
+            <a href="admin.inventory.delete.php?id=<?= $product->id ?>" class="bg-red-500 hover:bg-red-700 py-2">ลบ</a>
         </div>
     </div>
     <?php endforeach ?>

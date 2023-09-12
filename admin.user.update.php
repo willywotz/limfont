@@ -74,7 +74,7 @@ form input, form textarea, form button { @apply rounded p-4 bg-white w-full }
 
     <div class="flex flex-col gap-4">
         <label for="image" class="text-white">image</label>
-        <img id="previewImage" class="h-[256px] w-[256px]">
+        <img id="previewImage" class="h-[256px] w-[256px]" src="upload/<?= $user->image ?>">
         <input type="file" id="image" name="image" onchange="changePreviewImage(event)">
         <script>
         function changePreviewImage(event) {
