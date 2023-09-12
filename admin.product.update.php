@@ -8,8 +8,8 @@ if (isPost()) {
     if ($_FILES['image']['size'] > 0) {
         $_POST['image'] = uploadRandomName($_FILES['image']['tmp_name']);
     }
-    $stmt = db()->prepare('update product set title = ?, detail = ?, price = ?, image = ? where id = ?');
-    $result = $stmt->execute([$_POST['title'], $_POST['detail'], $_POST['price'], $_POST['image'], $_GET['id']]);
+    $stmt = db()->prepare('update product set title = ?, detail = ?, price = ?, image = ?, serial = ? where id = ?');
+    $result = $stmt->execute([$_POST['title'], $_POST['detail'], $_POST['price'], $_POST['image'], $_POST['serial'], $_GET['id']]);
     if (!$result) {
         if ($_POST['image'] != '256')
             unlink(UPLOADDIR.'/'.$_POST['image']);
@@ -38,6 +38,11 @@ form input, form textarea, form button { @apply rounded p-4 bg-white w-full }
 
 <form action="admin.product.update.php?id=<?= $product->id ?>"
     method="post" enctype="multipart/form-data" class="flex flex-col gap-8 my-8">
+
+    <div class="flex flex-col gap-4">
+        <label for="serial">serial</label>
+        <input type="text" id="serial" name="serial" value="<?= $product->serial ?>">
+    </div>
 
     <div class="flex flex-col gap-4">
         <label for="title">title</label>

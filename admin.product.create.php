@@ -6,8 +6,8 @@ if (isPost()) {
     if ($_FILES['image']['size'] > 0) {
         $_POST['image'] = uploadRandomName($_FILES['image']['tmp_name']);
     }
-    $stmt = db()->prepare('insert into product (title, detail, price, image) values (?, ?, ?, ?)');
-    $result = $stmt->execute([$_POST['title'], $_POST['detail'], $_POST['price'], $_POST['image']]);
+    $stmt = db()->prepare('insert into product (title, detail, price, image, serial) values (?, ?, ?, ?, ?)');
+    $result = $stmt->execute([$_POST['title'], $_POST['detail'], $_POST['price'], $_POST['image'], $_POST['serial']]);
     if (!$result) {
         if ($_POST['image'] != '256')
             unlink(UPLOADDIR.'/'.$_POST['image']);
@@ -36,6 +36,11 @@ form input, form textarea, form button { @apply rounded p-4 bg-white w-full }
 
 <form action="admin.product.create.php" method="post" enctype="multipart/form-data"
     class="flex flex-col gap-8 my-8">
+
+    <div class="flex flex-col gap-4">
+        <label for="serial">serial</label>
+        <input type="text" id="serial" name="serial">
+    </div>
 
     <div class="flex flex-col gap-4">
         <label for="title">title</label>
