@@ -2,15 +2,18 @@
 include '_adminhead.php';
 
 if (isPost()) {
-    $_POST['image'] = $product->image;
-    if ($_FILES['image']['size'] > 0) {
-        $_POST['image'] = uploadRandomName($_FILES['image']['tmp_name']);
-    }
+    $_POST['image'] = [];
+    if (count($_FILES['image']) > 0)
+        foreach ($_FILES['image'] as $item)
+            $_POST['image'][] = uploadRandomName($item['tmp_name']);
+    if (($_POST['image'] = join(' ', $_POST['image'])) == '')
+        $_POST['image'] = '256';
     $stmt = db()->prepare('insert into product (title, detail, price, image, serial) values (?, ?, ?, ?, ?)');
     $result = $stmt->execute([$_POST['title'], $_POST['detail'], $_POST['price'], $_POST['image'], $_POST['serial']]);
     if (!$result) {
         if ($_POST['image'] != '256')
-            unlink(UPLOADDIR.'/'.$_POST['image']);
+            foreach (split(' ', $_POST['image']) as $item)
+                unlink(UPLOADDIR.'/'.$item);
         goto render;
     }
     header('Location: admin.product.index.php');
@@ -59,12 +62,18 @@ form input, form textarea, form button { @apply rounded p-4 bg-white w-full }
 
     <div class="flex flex-col gap-4">
         <label for="image" class="text-white">image</label>
-        <img id="previewImage" class="h-[256px] w-[256px]">
-        <input type="file" id="image" name="image" onchange="changePreviewImage(event)">
+        <div id="previewImage" class="grid grid-cols-4 gap-4"></div>
+        <input type="file" id="image" name="image[]" multiple onchange="changePreviewImage(event)">
         <script>
         function changePreviewImage(event) {
-            document.getElementById('previewImage').src
-                = window.URL.createObjectURL(event.target.files[0]);
+            const el = document.getElementById('previewImage');
+            while (el.firstChild) el.removeChild(el.firstChild, el);
+            for (let f of event.target.files) {
+                const i = document.createElement('img');
+                i.setAttribute('class', 'h-[256px] w-[256px]');
+                i.src = window.URL.createObjectURL(f);
+                el.appendChild(i);
+            }
         }
         </script>
     </div>

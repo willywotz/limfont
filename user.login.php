@@ -42,8 +42,9 @@ render:
             <input type="text" id="identity" name="identity" class="rounded p-4">
         </div>
 
-        <div class="mt-4">
-            <button class="bg-blue-500 text-white p-4 text-center w-full rounded">login</button>
+        <div class="mt-4 flex flex-col gap-4 text-center">
+        <button class="bg-blue-500 hover:bg-blue-700 text-white rounded p-4">login</button>
+        <a href="user.register.php" class="bg-gray-500 hover:bg-gray-700 text-white rounded p-4">register</a>
         </div>
     </form>
 </body>
