@@ -4,8 +4,8 @@ include '_adminhead.php';
 $account = db()->query('select * from account where id = '.$_GET['id'])->fetch(PDO::FETCH_OBJ);
 
 if (isPost()) {
-    $stmt = db()->prepare('insert into account (detail, amount, type) values (?, ?, ?)');
-    $result = $stmt->execute([$_POST['detail'], $_POST['amount'], $_POST['type']]);
+    $stmt = db()->prepare('update account set detail = ?, amount = ?, type = ? where id = ?');
+    $result = $stmt->execute([$_POST['detail'], $_POST['amount'], $_POST['type'], $_GET['id']]);
     if (!$result) goto render;
     header('Location: admin.account.index.php');
     exit;
