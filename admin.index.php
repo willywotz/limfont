@@ -8,7 +8,7 @@
 
 <div class="mt-8 grid grid-cols-1 gap-4" id="adminMenu">
     <a href="admin.user.index.php">สมาชิก</a>
-    <a href="admin.inventory.index.php">สต๊อกสินค้า</a>
+    <a href="admin.product.index.php">สต๊อกสินค้า</a>
     <a href="admin.account.index.php">บัญชีรายรับรายจ่าย</a>
     <a href="admin.purchase.index.php">คำสั่งซื้อ</a>
 </div>

@@ -15,7 +15,7 @@ if (isPost()) {
             unlink(UPLOADDIR.'/'.$_POST['image']);
         goto render;
     }
-    header('Location: admin.inventory.index.php');
+    header('Location: admin.product.index.php');
     unlink(UPLOADDIR.'/'.$product->image);
     exit;
 }
@@ -27,7 +27,7 @@ render:
     <span>แก้ไขสินค้า</span>
 
     <div>
-        <a href="admin.inventory.index.php" class="bg-yellow-500 hover:bg-yellow-700 text-white rounded px-4 py-2">ย้อนกลับ</a>
+        <a href="admin.product.index.php" class="bg-yellow-500 hover:bg-yellow-700 text-white rounded px-4 py-2">ย้อนกลับ</a>
     </div>
 </div>
 
@@ -36,7 +36,7 @@ form label { @apply text-white text-xl }
 form input, form textarea, form button { @apply rounded p-4 bg-white w-full }
 </style>
 
-<form action="admin.inventory.update.php?id=<?= $product->id ?>"
+<form action="admin.product.update.php?id=<?= $product->id ?>"
     method="post" enctype="multipart/form-data" class="flex flex-col gap-8 my-8">
 
     <div class="flex flex-col gap-4">

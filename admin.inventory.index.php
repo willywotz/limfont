@@ -3,7 +3,7 @@
     <span>จัดการสต๊อกสินค้า</span>
 
     <div>
-        <a href="admin.inventory.create.php" class="bg-blue-500 hover:bg-blue-700 text-white rounded px-4 py-2">เพิ่มสินค้าใหม่</a>
+        <a href="admin.product.create.php" class="bg-blue-500 hover:bg-blue-700 text-white rounded px-4 py-2">เพิ่มสินค้าใหม่</a>
         <a href="admin.index.php" class="bg-yellow-500 hover:bg-yellow-700 text-white rounded px-4 py-2">ย้อนกลับ</a>
     </div>
 </div>
@@ -14,8 +14,8 @@
     <div class="rounded overflow-hidden bg-white">
         <div class="py-8 text-2xl border-b text-center"><?= $product->title ?></div>
         <div class="grid grid-cols-2 text-white text-center">
-            <a href="admin.inventory.update.php?id=<?= $product->id ?>" class="bg-yellow-500 hover:bg-yellow-700 py-2">แก้ไข</a>
-            <a href="admin.inventory.delete.php?id=<?= $product->id ?>" class="bg-red-500 hover:bg-red-700 py-2">ลบ</a>
+            <a href="admin.product.update.php?id=<?= $product->id ?>" class="bg-yellow-500 hover:bg-yellow-700 py-2">แก้ไข</a>
+            <a href="admin.product.delete.php?id=<?= $product->id ?>" class="bg-red-500 hover:bg-red-700 py-2">ลบ</a>
         </div>
     </div>
     <?php endforeach ?>
