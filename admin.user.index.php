@@ -1,7 +1,11 @@
 <?php include '_adminhead.php' ?>
 <div class="mt-8 text-white text-2xl flex justify-between items-center">
     <span>จัดการข้อมูลสมาชิก</span>
-    <a href="admin.user.create.php" class="bg-blue-500 hover:bg-blue-700 text-white rounded px-4 py-2">เพิ่มสมาชิกใหม่</a>
+
+    <div>
+        <a href="admin.user.create.php" class="bg-blue-500 hover:bg-blue-700 text-white rounded px-4 py-2">เพิ่มสมาชิกใหม่</a>
+        <a href="admin.index.php" class="bg-yellow-500 hover:bg-yellow-700 text-white rounded px-4 py-2">ย้อนกลับ</a>
+    </div>
 </div>
 
 <div class="mt-8 grid grid-cols-3 gap-4">
