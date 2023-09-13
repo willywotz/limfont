@@ -4,7 +4,7 @@ include '_adminhead.php';
 $product = db()->query('select * from product where id = '.$_GET['id'])->fetch(PDO::FETCH_OBJ);
 
 if (isPost()) {
-    $_POST['image'] = split(' ', $product->image);
+    $_POST['image'] = explode(' ', $product->image);
     if (count($_FILES['image']) > 0)
         foreach ($_FILES['image'] as $item)
             $_POST['image'][] = uploadRandomName($item['tmp_name']);
@@ -15,7 +15,7 @@ if (isPost()) {
     $result = $stmt->execute([$_POST['title'], $_POST['detail'], $_POST['price'], $_POST['image'], $_POST['serial'], $_GET['id']]);
     if (!$result) {
         if ($_POST['image'] != '256')
-            foreach (split(' ', $_POST['image']) as $item)
+            foreach (explode(' ', $_POST['image']) as $item)
                 unlink(UPLOADDIR.'/'.$item);
         goto render;
     }
@@ -66,7 +66,7 @@ form input, form textarea, form button { @apply rounded p-4 bg-white w-full }
     <div class="flex flex-col gap-4">
         <label for="image" class="text-white">image</label>
         <div id="previewImage" class="grid grid-cols-4 gap-4">
-            <?php foreach (split(' ', $product->image) as $item): ?>
+            <?php foreach (explode(' ', $product->image) as $item): ?>
             <img src="upload/<?= $item ?>" class="h-[256px] w-[256px]">
             <?php endforeach ?>
         </div>

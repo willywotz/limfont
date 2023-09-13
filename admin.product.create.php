@@ -12,7 +12,7 @@ if (isPost()) {
     $result = $stmt->execute([$_POST['title'], $_POST['detail'], $_POST['price'], $_POST['image'], $_POST['serial']]);
     if (!$result) {
         if ($_POST['image'] != '256')
-            foreach (split(' ', $_POST['image']) as $item)
+            foreach (explode(' ', $_POST['image']) as $item)
                 unlink(UPLOADDIR.'/'.$item);
         goto render;
     }
