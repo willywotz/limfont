@@ -1,16 +1,19 @@
 <?php
 include '_adminhead.php';
 
+set_time_limit(5);
+
 $product = db()->query('select * from product where id = '.$_GET['id'])->fetch(PDO::FETCH_OBJ);
 
 if (isPost()) {
     $oldImage = explode(' ', $product->image);
     $_POST['image'] = $oldImage;
 
-    if (count($_FILES['image']['tmp_name']) > 0)
+    if ($_FILES['image']['tmp_name'][0] != '') {
         $_POST['image'] = [];
         foreach ($_FILES['image']['tmp_name'] as $item)
             $_POST['image'][] = uploadRandomName($item);
+    }
 
     if (($_POST['image'] = implode(' ', $_POST['image'])) == '') {
         $_POST['image'] = '256';
@@ -24,9 +27,11 @@ if (isPost()) {
                 unlink(UPLOADDIR.'/'.$item);
         goto render;
     }
-    if (implode(' ', $oldImage) != '256')
+
+    if ($_FILES['image']['tmp_name'][0] != '' && $oldImage[0] != '256')
         foreach ($oldImage as $item)
             unlink(UPLOADDIR.'/'.$item);
+
     header('Location: admin.product.index.php');
     exit;
 }

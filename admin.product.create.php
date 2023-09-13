@@ -4,7 +4,7 @@ include '_adminhead.php';
 if (isPost()) {
     $_POST['image'] = [];
 
-    if (count($_FILES['image']['tmp_name']) > 0)
+    if ($_FILES['image']['tmp_name'][0] != '')
         foreach ($_FILES['image']['tmp_name'] as $item)
             $_POST['image'][] = uploadRandomName($item);
 
