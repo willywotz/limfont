@@ -4,12 +4,17 @@ include '_adminhead.php';
 $product = db()->query('select * from product where id = '.$_GET['id'])->fetch(PDO::FETCH_OBJ);
 
 if (isPost()) {
-    $_POST['image'] = explode(' ', $product->image);
-    if (count($_FILES['image']) > 0)
-        foreach ($_FILES['image'] as $item)
-            $_POST['image'][] = uploadRandomName($item['tmp_name']);
-    if (($_POST['image'] = join(' ', $_POST['image'])) == '')
+    $oldImage = explode(' ', $product->image);
+    $_POST['image'] = $oldImage;
+
+    if (count($_FILES['image']['tmp_name']) > 0)
+        $_POST['image'] = [];
+        foreach ($_FILES['image']['tmp_name'] as $item)
+            $_POST['image'][] = uploadRandomName($item);
+
+    if (($_POST['image'] = implode(' ', $_POST['image'])) == '') {
         $_POST['image'] = '256';
+    }
 
     $stmt = db()->prepare('update product set title = ?, detail = ?, price = ?, image = ?, serial = ? where id = ?');
     $result = $stmt->execute([$_POST['title'], $_POST['detail'], $_POST['price'], $_POST['image'], $_POST['serial'], $_GET['id']]);
@@ -19,8 +24,10 @@ if (isPost()) {
                 unlink(UPLOADDIR.'/'.$item);
         goto render;
     }
+    if (implode(' ', $oldImage) != '256')
+        foreach ($oldImage as $item)
+            unlink(UPLOADDIR.'/'.$item);
     header('Location: admin.product.index.php');
-    unlink(UPLOADDIR.'/'.$product->image);
     exit;
 }
 

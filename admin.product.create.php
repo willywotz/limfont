@@ -3,11 +3,15 @@ include '_adminhead.php';
 
 if (isPost()) {
     $_POST['image'] = [];
-    if (count($_FILES['image']) > 0)
-        foreach ($_FILES['image'] as $item)
-            $_POST['image'][] = uploadRandomName($item['tmp_name']);
-    if (($_POST['image'] = join(' ', $_POST['image'])) == '')
+
+    if (count($_FILES['image']['tmp_name']) > 0)
+        foreach ($_FILES['image']['tmp_name'] as $item)
+            $_POST['image'][] = uploadRandomName($item);
+
+    if (($_POST['image'] = implode(' ', $_POST['image'])) == '') {
         $_POST['image'] = '256';
+    }
+
     $stmt = db()->prepare('insert into product (title, detail, price, image, serial) values (?, ?, ?, ?, ?)');
     $result = $stmt->execute([$_POST['title'], $_POST['detail'], $_POST['price'], $_POST['image'], $_POST['serial']]);
     if (!$result) {
@@ -17,7 +21,6 @@ if (isPost()) {
         goto render;
     }
     header('Location: admin.product.index.php');
-    unlink(UPLOADDIR.'/'.$product->image);
     exit;
 }
 
